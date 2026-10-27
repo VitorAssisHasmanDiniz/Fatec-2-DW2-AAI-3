@@ -1,12 +1,12 @@
 # Sistema de Vendas com Comissões, Metas e Performance
 
-API REST desenvolvida com Node.js, Express e MySQL/MariaDB para gerenciamento de vendedores, vendas, cálculo automático de comissões e relatórios de desempenho.
+API REST desenvolvida com Node.js, Express e MySQL para gerenciamento de vendedores, vendas, cálculo automático de comissões e relatórios de desempenho.
 
 ## Tecnologias utilizadas
 
 - Node.js
 - Express
-- MySQL/MariaDB
+- MySQL
 - mysql2
 - dotenv
 - Nodemon
@@ -56,13 +56,14 @@ API REST desenvolvida com Node.js, Express e MySQL/MariaDB para gerenciamento de
 ├── .gitignore
 ├── package.json
 └── README.md
+
 ```
 
 ## Pré-requisitos
 
-- Node.js e npm instalados.
-- MySQL ou MariaDB instalado e em execução.
-- Banco de dados configurado com as tabelas definidas em `schema.sql`.
+* Node.js e npm instalados.
+* MySQL Server instalado e em execução.
+* Banco de dados configurado com as tabelas definidas em `schema.sql`.
 
 ## Instalação
 
@@ -71,35 +72,64 @@ Clone o repositório e entre na pasta do projeto:
 ```bash
 git clone <URL_DO_REPOSITORIO>
 cd <PASTA_DO_PROJETO>
+
 ```
 
 Instale as dependências:
 
 ```bash
 npm install
+
 ```
 
-## Configuração do banco de dados
+## Configuração do banco de dados (MySQL)
 
 Crie o banco e as tabelas executando o arquivo `schema.sql`.
 
-No MariaDB, por exemplo:
+### No Linux (Ubuntu/Debian)
 
+1. Acesse o MySQL via terminal:
 ```bash
-sudo mariadb
+sudo mysql -u root -p
+
 ```
 
-Dentro do console SQL:
 
+2. No console do MySQL, execute o script:
 ```sql
 SOURCE /caminho/completo/para/schema.sql;
+
 ```
 
-Substitua o caminho pelo local real do arquivo `schema.sql`.
 
-O script deve criar o banco `db_vendas`, as tabelas necessárias e os dados de teste.
+*(Ou execute diretamente pelo terminal: `sudo mysql -u root -p < schema.sql`)*
 
-**Atenção:** execute o script com cuidado caso o banco já possua dados, pois a recriação de tabelas pode apagá-los, dependendo do conteúdo de `schema.sql`.
+### No Windows
+
+Você pode importar o script via **PowerShell / Prompt de Comando (CMD)** ou via **MySQL Workbench**:
+
+#### Opção A: Linha de comando (PowerShell/CMD)
+
+1. Abra o terminal e navegue até o diretório onde o arquivo `schema.sql` está localizado.
+2. Execute o comando apontando para o seu executável do MySQL (ajuste o caminho do `mysql.exe` se necessário):
+```cmd
+"C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p < schema.sql
+
+```
+
+
+
+#### Opção B: MySQL Workbench
+
+1. Abra o MySQL Workbench e conecte-se ao seu servidor local.
+2. Acesse **File** > **Open SQL Script...** e selecione o arquivo `schema.sql`.
+3. Clique no ícone de raio (⚡) para executar o script inteiro.
+
+---
+
+O script criará o banco de dados `db_vendas`, as tabelas necessárias e os dados de teste.
+
+> **Atenção:** Execute o script com cuidado caso o banco já possua dados, pois a recriação de tabelas pode apagá-los, dependendo das instruções contidas no `schema.sql`.
 
 ## Variáveis de ambiente
 
@@ -111,11 +141,12 @@ PORT=3000
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
-DB_PASSWORD=
+DB_PASSWORD=sua_senha_aqui
 DB_NAME=db_vendas
+
 ```
 
-Ajuste o usuário, a senha, a porta e o endereço conforme sua instalação do banco de dados.
+Ajuste o usuário, a senha, a porta e o endereço conforme sua instalação do MySQL.
 
 Não compartilhe o arquivo `.env` nem envie credenciais para o repositório.
 
@@ -125,24 +156,28 @@ Para iniciar a API:
 
 ```bash
 npm start
+
 ```
 
-Para executar em modo de desenvolvimento:
+Para executar em modo de desenvolvimento (com auto-reload via Nodemon):
 
 ```bash
 npm run dev
+
 ```
 
 Por padrão, a API estará disponível em:
 
 ```text
 http://localhost:3000
+
 ```
 
 O endpoint de saúde pode ser consultado em:
 
 ```bash
 curl http://localhost:3000/health
+
 ```
 
 ## Endpoints
@@ -151,12 +186,13 @@ Todas as requisições com corpo JSON devem utilizar o cabeçalho:
 
 ```http
 Content-Type: application/json
+
 ```
 
 ### Vendedores
 
 | Método | Endpoint | Descrição |
-|---|---|---|
+| --- | --- | --- |
 | POST | `/vendedores` | Cadastra um vendedor |
 | GET | `/vendedores` | Lista vendedores |
 | GET | `/vendedores/:id` | Consulta um vendedor |
@@ -167,6 +203,7 @@ Content-Type: application/json
 
 ```http
 POST /vendedores
+
 ```
 
 Exemplo de corpo:
@@ -178,6 +215,7 @@ Exemplo de corpo:
   "percentual_comissao": 5,
   "id_regiao": 1
 }
+
 ```
 
 Os campos devem corresponder aos nomes aceitos pelo endpoint e às colunas existentes no banco. Se o cadastro de vendedor utilizar outros campos obrigatórios, informe-os também.
@@ -186,24 +224,28 @@ Os campos devem corresponder aos nomes aceitos pelo endpoint e às colunas exist
 
 ```bash
 curl http://localhost:3000/vendedores
+
 ```
 
 Para filtrar vendedores ativos, caso o endpoint ofereça esse filtro:
 
 ```bash
 curl "http://localhost:3000/vendedores?ativos=true"
+
 ```
 
 Para consultar um vendedor específico:
 
 ```bash
 curl http://localhost:3000/vendedores/1
+
 ```
 
 #### Atualizar vendedor
 
 ```http
 PUT /vendedores/1
+
 ```
 
 Exemplo de corpo:
@@ -213,6 +255,7 @@ Exemplo de corpo:
   "meta_mensal": 25000,
   "percentual_comissao": 6
 }
+
 ```
 
 Envie os campos aceitos pela implementação atual do endpoint.
@@ -221,6 +264,7 @@ Envie os campos aceitos pela implementação atual do endpoint.
 
 ```bash
 curl -X PATCH http://localhost:3000/vendedores/1/desativar
+
 ```
 
 A desativação mantém o histórico de vendas do vendedor.
@@ -228,7 +272,7 @@ A desativação mantém o histórico de vendas do vendedor.
 ### Vendas
 
 | Método | Endpoint | Descrição |
-|---|---|---|
+| --- | --- | --- |
 | POST | `/vendas` | Registra uma venda |
 | GET | `/vendas` | Lista vendas |
 | GET | `/vendas/vendedor/:id` | Consulta vendas de um vendedor |
@@ -239,6 +283,7 @@ A desativação mantém o histórico de vendas do vendedor.
 
 ```http
 POST /vendas
+
 ```
 
 Exemplo de corpo:
@@ -250,6 +295,7 @@ Exemplo de corpo:
   "valor_venda": 1500,
   "tipo_cliente": "PF"
 }
+
 ```
 
 O exemplo pressupõe que os campos correspondam ao contrato implementado no projeto.
@@ -258,37 +304,41 @@ O sistema valida o vendedor, sua situação cadastral, a região, o tipo de clie
 
 Os tipos de cliente utilizados são:
 
-- `PF`: pessoa física.
-- `PJ`: pessoa jurídica.
+* `PF`: pessoa física.
+* `PJ`: pessoa jurídica.
 
 #### Listar vendas
 
 ```bash
 curl http://localhost:3000/vendas
+
 ```
 
 #### Consultar vendas por vendedor
 
 ```bash
 curl http://localhost:3000/vendas/vendedor/1
+
 ```
 
 #### Consultar vendas por região
 
 ```bash
 curl http://localhost:3000/vendas/regiao/1
+
 ```
 
 #### Excluir venda
 
 ```bash
 curl -X DELETE http://localhost:3000/vendas/1
+
 ```
 
 ### Relatórios
 
 | Método | Endpoint | Descrição |
-|---|---|---|
+| --- | --- | --- |
 | GET | `/relatorios/performance?inicio=YYYY-MM-DD&fim=YYYY-MM-DD` | Gera o relatório de performance |
 
 #### Gerar relatório
@@ -297,19 +347,20 @@ curl -X DELETE http://localhost:3000/vendas/1
 curl -G http://localhost:3000/relatorios/performance \
   --data-urlencode "inicio=2026-10-01" \
   --data-urlencode "fim=2026-10-31"
+
 ```
 
 O relatório retorna informações como:
 
-- Período consultado.
-- Quantidade total de vendas.
-- Valor total vendido.
-- Comissão média.
-- Vendas agrupadas por região.
-- Vendas agrupadas por tipo de cliente.
-- Vendedor com maior valor vendido.
-- Vendedor com maior comissão acumulada.
-- Quantidade de vendedores que atingiram as metas, conforme os critérios da consulta.
+* Período consultado.
+* Quantidade total de vendas.
+* Valor total vendido.
+* Comissão média.
+* Vendas agrupadas por região.
+* Vendas agrupadas por tipo de cliente.
+* Vendedor com maior valor vendido.
+* Vendedor com maior comissão acumulada.
+* Quantidade de vendedores que atingiram as metas, conforme os critérios da consulta.
 
 As datas devem estar no formato `YYYY-MM-DD`. O período inicial não pode ser posterior ao período final.
 
@@ -320,7 +371,7 @@ As datas devem estar no formato `YYYY-MM-DD`. O período inicial não pode ser p
 A comissão é calculada com base no valor da venda, no percentual-base do vendedor, no tipo de cliente e na região.
 
 | Critério | Bônus |
-|---|---:|
+| --- | --- |
 | Pessoa física (PF) | +2% |
 | Pessoa jurídica (PJ) | +3% |
 | Região Norte | +1% |
@@ -336,6 +387,7 @@ O percentual total corresponde à soma do percentual-base com os bônus aplicáv
 percentual_total = percentual_base + bonus_cliente + bonus_regiao
 
 comissao = valor_venda * percentual_total / 100
+
 ```
 
 Exemplo: para uma venda de R$ 1.000,00, com percentual-base de 5%, cliente PF e região Norte:
@@ -344,16 +396,17 @@ Exemplo: para uma venda de R$ 1.000,00, com percentual-base de 5%, cliente PF e 
 Percentual total = 5% + 2% + 1% = 8%
 
 Comissão = 1000 * 8 / 100 = R$ 80,00
+
 ```
 
 ### Validações
 
-- O valor da venda deve ser positivo.
-- O vendedor precisa existir e estar ativo.
-- A região informada precisa existir.
-- O tipo de cliente deve ser válido.
-- Os campos obrigatórios precisam ser informados.
-- As datas dos relatórios devem ser válidas e formar um período consistente.
+* O valor da venda deve ser positivo.
+* O vendedor precisa existir e estar ativo.
+* A região informada precisa existir.
+* O tipo de cliente deve ser válido.
+* Os campos obrigatórios precisam ser informados.
+* As datas dos relatórios devem ser válidas e formar um período consistente.
 
 ## Tratamento de erros
 
@@ -365,6 +418,7 @@ Exemplo ilustrativo:
 {
   "erro": "Mensagem explicativa do erro"
 }
+
 ```
 
 O formato exato da resposta depende do middleware implementado.
@@ -384,11 +438,11 @@ Exemplo de sequência básica:
 
 ## Segurança e boas práticas
 
-- Consultas ao banco utilizam parâmetros para reduzir riscos de SQL injection.
-- Credenciais são configuradas por variáveis de ambiente.
-- Erros são tratados em um middleware centralizado.
-- O registro de venda utiliza transação para manter a consistência dos dados.
+* Consultas ao banco utilizam parâmetros para reduzir riscos de SQL injection.
+* Credenciais são configuradas por variáveis de ambiente.
+* Erros são tratados em um middleware centralizado.
+* O registro de venda utiliza transação para manter a consistência dos dados.
 
-## Autor
+## Sobre
 
 Projeto acadêmico desenvolvido para a disciplina de Desenvolvimento Web II.
